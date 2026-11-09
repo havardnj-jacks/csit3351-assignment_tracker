@@ -168,6 +168,9 @@ async function login() {
             document.getElementById("loginButton").style.display = "none";
             document.getElementById("logoutButton").style.display = "block";
         }
+        else {
+            alert(result.error || "Login failed.");
+        }
 
     } catch (error) {
         console.error(error);
