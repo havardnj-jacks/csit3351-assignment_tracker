@@ -49,7 +49,7 @@ async function addClass() {
             return;
         }
 
-        alert("Class added successfully!");
+        alert("Class added");
 
         document.getElementById("className").value = "";
         document.getElementById("classTime").value = "";

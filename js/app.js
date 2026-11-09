@@ -89,11 +89,20 @@ function buildLayout(currentPage) {
     var header = document.getElementById("header");
     header.appendChild(makeElement("h1", "Assignment Tracker"));
 
+
     if (currentPage == "college-board.html") {
         var loginButton = makeButton("Log In / Sign Up", openLogin);
+        loginButton.id = "loginButton";
         loginButton.className = "login-button";
         header.appendChild(loginButton);
+
+        var logoutButton = makeButton("Log Out", logout);
+        logoutButton.id = "logoutButton";
+        logoutButton.className = "login-button";
+        logoutButton.style.display = "none";
+        header.appendChild(logoutButton);
     }
+
 
     var themeButton = makeButton("Light mode", toggleTheme);
     themeButton.id = "themeButton";
@@ -243,7 +252,7 @@ async function addAssignmentFromForm() {
         var result = await response.json();
 
         if (result.success) {
-            alert("Assignment added successfully!");
+            alert("Assignment added");
 
             document.getElementById("assignmentTitle").value = "";
             document.getElementById("assignmentDate").value = "";

@@ -135,8 +135,9 @@ function closeLogin() {
     document.getElementById("accountDialog").close();
 }
 
-function login() {
-    var email = document.getElementById("loginEmail").value;
+
+async function login() {
+    var email = document.getElementById("loginEmail").value.trim();
     var password = document.getElementById("loginPassword").value;
 
     if (email == "" || password == "") {
@@ -144,19 +145,118 @@ function login() {
         return;
     }
 
-    alert("You have logged in");
-    closeLogin();
+    var formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+        var response = await fetch("../php/login.php", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        var result = await response.json();
+
+        if (result.success) {
+            alert("User logged in.");
+            closeLogin();
+
+            document.getElementById("loginButton").style.display = "none";
+            document.getElementById("logoutButton").style.display = "block";
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Could not connect to the server.");
+    }
 }
 
-function signup() {
-    var email = document.getElementById("signupEmail").value;
+
+
+async function signup() {
+    var username = document.getElementById("signupUsername").value.trim();
+    var email = document.getElementById("signupEmail").value.trim();
     var password = document.getElementById("signupPassword").value;
 
-    if (email == "" || password == "") {
-        alert("Please enter your email and password.");
+    if (username == "" || email == "" || password == "") {
+        alert("Please fill in all fields.");
         return;
     }
 
-    alert("Sign up successful");
-    closeLogin();
+    var formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+        var response = await fetch("../php/register.php", {
+            method: "POST",
+            body: formData
+        });
+
+        var result = await response.json();
+
+        if (result.success) {
+            alert("Account created.");
+            closeLogin();
+        } else {
+            alert(result.error || "Account creation failed.");
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Could not connect to the server.");
+    }
 }
+
+
+async function checkLoginStatus() {
+    try {
+        var response = await fetch("../php/session_status.php");
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        var result = await response.json();
+
+        document.getElementById("loginButton").style.display =
+            result.loggedIn ? "none" : "block";
+
+        document.getElementById("logoutButton").style.display =
+            result.loggedIn ? "block" : "none";
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function logout() {
+    try {
+        var response = await fetch("../php/logout.php", {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            throw new Error("Server error");
+        }
+
+        var result = await response.json();
+
+        if (result.success) {
+            alert("Logged out successfully!");
+            await checkLoginStatus();
+        } else {
+            alert(result.error || "Logout failed.");
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Could not connect to the server.");
+    }
+}
+
+checkLoginStatus();
